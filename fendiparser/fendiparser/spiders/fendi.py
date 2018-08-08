@@ -1,7 +1,6 @@
 import scrapy
 from ..items import FendiParserItem
 
-
 class FendiSpider(scrapy.Spider):
     name = "fendi"
     start_urls = ["https://www.fendi.com/us/woman/bags",
@@ -20,7 +19,6 @@ class FendiSpider(scrapy.Spider):
     def parse_article(self, response):
         item = FendiParserItem()
         item['title'] = self.parse_title(response)
-        item['brand'] = self.parse_brand(response)
         item['price'] = self.parse_price(response)
         item['description'] = self.parse_description(response)
         item['images'] = self.parse_images(response)
@@ -34,14 +32,10 @@ class FendiSpider(scrapy.Spider):
                                         'div[@class="product-description"]/h1/text()').extract()
         return title
 
-    def parse_brand(self, response):
-        brand = 'FENDI'
-        return brand
-
     def parse_price(self, response):
         price = response.selector.xpath('//div[@class="product-info"]/'
                                         'div[@class="product-description"]/div[contains(@class, "prices")]/'
-                                        '/span[@class="price "]/text()').extract()
+                                        'span[@class="price "]/text()').extract()
         return price
 
     def parse_description(self, response):
@@ -51,17 +45,11 @@ class FendiSpider(scrapy.Spider):
         return description
 
     def parse_images(self, response):
-        images = response.selector.xpath('//div[@class="product"]/'
-                                        'div[@class="main-product")]/div[contains(@class, "product-gallery")]'
-                                        '/div[@class="carousel-nav"]/div[contains(@class, "nav-item")]/img/@src').extract()
+        images = response.xpath('//img[@class="lazyload"]/@src').extract()
         return images
 
     def parse_size(self, response):
         size = response.selector.xpath('//div[@class="product-info"]/'
                                         'div[contains(@class, "product-form")]/form/div[@class="form-group"]/'
-                                        '/select[contains(@class, "form-control"]/option/text()').extract()
+                                        'select[contains(@class, "form-control")]/option/text()').extract()
         return size
-
-
-
-
